@@ -13,7 +13,7 @@ $plugins = @(
     @{
         Key    = "EGISTieWithCant"
         Desc   = "EGIS Smart Tools - Tie With Cant"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISTieWithCant_Plugin.bundle\Contents\Win64\TieWithCant.dll"
+        DLL    = "C:\Users\[TU USUARIO]\AppData\Roaming\Autodesk\ApplicationPlugins\EGISTieWithCant_Plugin.bundle\Contents\Win64\TieWithCant.dll"
     }
 )
 
