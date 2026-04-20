@@ -8,7 +8,7 @@ $plugins = @(
     @{
         Key    = "EGISParameterSync"
         Desc   = "EGIS Parameter Sync Civil 3D"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
+        DLL    = "C:\Users\[TU USUARIO]\AppData\Roaming\Autodesk\ApplicationPlugins\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
     },
     @{
         Key    = "EGISTieWithCant"
