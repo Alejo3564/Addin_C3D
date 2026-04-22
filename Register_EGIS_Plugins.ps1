@@ -9,6 +9,7 @@ $plugins = @(
         Key    = "EGISParameterSync"
         Desc   = "EGIS Parameter Sync Civil 3D"
         DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
+
     },
     @{
         Key    = "EGISTieWithCant"
@@ -19,7 +20,13 @@ $plugins = @(
         Key    = "EGISProjectInfoSync"
         Desc   = "EGIS Project Information Sync Civil 3D"
         DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISProjectInfoSync_Plugin.bundle\Contents\Win64\EGISProjectInfoSync.dll"
+    },
+        @{
+        Key    = "EGISPdfExporter"
+        Desc   = "EGIS Print PDF with standar name layout"
+        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISPdfExporter_Plugin.bundle\Contents\Win64\EGISPdfExporter.dll"
     }
+    
 )
 
 $base = "HKCU:\Software\Autodesk\AutoCAD"
