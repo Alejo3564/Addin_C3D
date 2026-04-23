@@ -11,7 +11,7 @@ $plugins = @(
     @{
         Key    = "EGISParameterSync"
         Desc   = "EGIS Parameter Sync Civil 3D"
-        DLL    = "$bundleRoot\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
+        DLL    = "$bundleRoot\EEGISParameterSync_Plugin.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
     },
     @{
         Key    = "EGISTieWithCant"
