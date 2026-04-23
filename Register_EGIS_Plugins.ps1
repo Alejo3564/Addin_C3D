@@ -2,31 +2,32 @@
 # EGIS Smart Tools - Plugin Loader
 # Registers ALL EGIS plugins in the Civil 3D registry.
 # Each plugin gets its own unique key → no conflicts.
+# Portable: uses $env:APPDATA — no hardcoded username.
 # ============================================================
+
+$bundleRoot = "$env:APPDATA\Autodesk\ApplicationPlugins"
 
 $plugins = @(
     @{
         Key    = "EGISParameterSync"
         Desc   = "EGIS Parameter Sync Civil 3D"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
-
+        DLL    = "$bundleRoot\EGISParameterSync_Civil3D.bundle\Contents\Win64\EGISParameterSync_Civil3D.dll"
     },
     @{
         Key    = "EGISTieWithCant"
         Desc   = "EGIS Smart Tools - Tie With Cant"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISTieWithCant_Plugin.bundle\Contents\Win64\TieWithCant.dll"
+        DLL    = "$bundleRoot\EGISTieWithCant_Plugin.bundle\Contents\Win64\TieWithCant.dll"
     },
-        @{
+    @{
         Key    = "EGISProjectInfoSync"
         Desc   = "EGIS Project Information Sync Civil 3D"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISProjectInfoSync_Plugin.bundle\Contents\Win64\EGISProjectInfoSync.dll"
+        DLL    = "$bundleRoot\EGISProjectInfoSync_Plugin.bundle\Contents\Win64\EGISProjectInfoSync.dll"
     },
-        @{
+    @{
         Key    = "EGISPdfExporter"
         Desc   = "EGIS Print PDF with standar name layout"
-        DLL    = "C:\Users\ahern\AppData\Roaming\Autodesk\ApplicationPlugins\EGISPdfExporter_Plugin.bundle\Contents\Win64\EGISPdfExporter.dll"
+        DLL    = "$bundleRoot\EGISPdfExporter_Plugin.bundle\Contents\Win64\EGISPdfExporter.dll"
     }
-    
 )
 
 $base = "HKCU:\Software\Autodesk\AutoCAD"
