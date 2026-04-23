@@ -8,7 +8,7 @@ echo   Instalador de plugin para Civil 3D 2026
 echo  ============================================================
 echo.
 
-set "BUNDLE_NAME=EGISPdfExporter.bundle"
+set "BUNDLE_NAME=EGISPdfExporter_Plugin.bundle"
 set "DEST=%APPDATA%\Autodesk\ApplicationPlugins\%BUNDLE_NAME%"
 set "SOURCE=%~dp0%BUNDLE_NAME%"
 
