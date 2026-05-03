@@ -27,27 +27,6 @@ and lives under the **EGIS Smart Tools** ribbon tab.
 
 ---
 
-## Architecture
-
-```
-EGISStreetView/
-├── EGISStreetView.csproj     # net8.0-windows, WPF, WebView2, ProjNet
-├── StreetViewApp.cs           # IExtensionApplication — ribbon + palette bootstrap
-├── StreetViewCommands.cs      # [CommandMethod] handlers (PICK, OPEN, BROWSER)
-├── StreetViewPalette.cs       # PaletteSet + WPF control (UI built in pure C#)
-├── CoordinateTransformer.cs   # WGS84 transformation via Civil 3D GeoData API
-├── Install.ps1                # Registry-based installer (machine-agnostic)
-├── build.bat                  # Build + deploy script
-├── create_icons.py            # Generates placeholder PNG icons
-├── Resources/
-│   ├── StreetView32.png
-│   ├── StreetView16.png
-│   └── EgisLogo.png
-└── Bundle/
-    └── EGISStreetView.bundle/
-        └── PackageContents.xml
-```
-
 ### Command flow
 
 ```
@@ -75,101 +54,8 @@ User clicks "Pick Point in Model"
 
 ---
 
-## Coordinate Transformation
 
-The plugin reads the geographic coordinate system directly from:
 
-1. **Civil 3D DrawingSettings** — `UnitZoneSettings.ZoneName` / `.ZoneGroup`
-2. **AutoCAD GeoData object** (`ACDB_GEODATA` in NamedObjectsDictionary)
-   — calls `TransformModelToLonLat(Point3d)` which internally uses
-   the CS assigned via `GEOGRAPHICLOCATION`.
-
-**No manual CRS configuration is needed.** The drawing's assigned coordinate
-system (e.g., "UTM Zone 18N", "MAGNA-SIRGAS / Colombia Bogota zone") is used
-automatically. Civil 3D supports all EPSG/ESRI codes.
-
-### Requirements for coordinate transformation
-
-- The drawing must have a geographic location set:
-  - `GEOGRAPHICLOCATION` command  **or**
-  - Civil 3D: Drawing Settings → Units & Zone → coordinate system
-
-If not configured, the plugin displays a clear warning panel.
-
----
-
-## Street View Display
-
-### Option A — Embedded in Civil 3D (preferred)
-
-Uses **Microsoft WebView2** (Chromium-based). Loads a Google Maps Embed iframe
-showing Street View at the selected coordinates.
-
-> **Note on Google Maps Embed API:**
-> The basic Maps Embed URL works without an API key for personal/internal use.
-> For production deployment with heavy usage, obtain a free **Google Maps
-> Embed API key** from [console.cloud.google.com](https://console.cloud.google.com)
-> and replace `YOUR_API_KEY` in `StreetViewPalette.cs → BuildStreetViewHtml()`.
-> The Embed API has a free tier of 28,000 requests/month.
-
-**WebView2 Runtime install:**
-```
-https://developer.microsoft.com/en-us/microsoft-edge/webview2/
-```
-(~120 MB, installs silently, persists across updates)
-
-### Option B — System browser (automatic fallback)
-
-If WebView2 is not installed, the plugin opens:
-```
-https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat},{lon}
-```
-This URL opens Street View in the default browser at the selected location.
-
----
-
-## Build Prerequisites
-
-| Requirement | Version |
-|-------------|---------|
-| .NET SDK | 8.0+ |
-| AutoCAD Civil 3D | 2026 (R25.1) |
-| Visual Studio | 2022+ (or `dotnet build`) |
-| WebView2 Runtime | Latest (optional, for embedded viewer) |
-
-### Build
-
-```batch
-# Edit AcadDir in build.bat to match your Civil 3D installation path, then:
-build.bat
-```
-
-Or with dotnet CLI:
-```batch
-set AcadDir=C:\Program Files\Autodesk\AutoCAD 2026\
-dotnet build EGISStreetView.csproj -c Release -p:AcadDir="%AcadDir%"
-```
-
-### Install
-
-```powershell
-# Run after build:
-.\Install.ps1 -DllPath "path\to\EGISStreetView.dll"
-
-# Uninstall:
-.\Install.ps1 -Uninstall
-```
-
----
-
-## NuGet Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| `Microsoft.Web.WebView2` | Embedded Chromium browser (Street View viewer) |
-| `ProjNet` | Coordinate reference system transformations (fallback) |
-
----
 
 ## Usage
 
@@ -191,17 +77,6 @@ dotnet build EGISStreetView.csproj -c Release -p:AcadDir="%AcadDir%"
 | WebView2 needs separate runtime install | Plugin detects and offers browser fallback |
 | Very remote locations may not have Street View coverage | Plugin loads map view as fallback |
 
----
-
-## EGIS Brand Reference
-
-| Element | Color | Hex |
-|---------|-------|-----|
-| Header background | Midnight Blue | `#08212C` |
-| Primary buttons (Azure) | Azure Blue 500 | `#0099A5` |
-| CTA button (Pick Point) | Vert Egis 800 | `#ABC022` |
-| Accent bar | Azure Blue 400 | `#2EABB5` |
-| Page background | Light gray | `#F5F7F8` |
 
 ---
 
