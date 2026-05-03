@@ -2,51 +2,6 @@
 
 **EGIS Smart Tools ribbon tab → Layouts & Sheets panel**
 
----
-
-## Features
-
-| # | Feature |
-|---|---------|
-| 1 | **List all paper-space layouts** with checkboxes (Select All / Deselect All) |
-| 2 | **Inline single rename** — click the layout name in the list and type a new name |
-| 3 | **Batch rename** selected layouts with Prefix / Suffix / Start Number / Increment / Padding |
-| 4 | **Load title block attributes** from the first block-with-attributes in each selected layout |
-| 5 | **Edit attributes** in an editable grid and **save to all selected layouts** at once |
-| 6 | EGIS brand palette (Midnight Blue / Azure / Vert Egis) — matches EGIS Parameter Sync |
-
----
-
-## Project Structure
-
-```
-EGISLayoutManager/
-├── EGISLayoutManager.csproj
-├── Plugin.cs                   ← IExtensionApplication + ribbon + [CommandMethod]
-├── Commands/                   ← (commands embedded in Plugin.cs)
-├── Models/
-│   └── LayoutItem.cs           ← LayoutItem, AttributeItem (INotifyPropertyChanged)
-├── Services/
-│   └── DrawingService.cs       ← All DB read/write (layouts + attributes)
-├── UI/
-│   ├── LayoutManagerPanel.cs   ← Pure C# WPF UserControl (no XAML)
-│   └── PaletteHost.cs          ← PaletteSet singleton host
-├── Resources/
-│   ├── layout_manager_32.png
-│   └── layout_manager_16.png
-├── PackageContents.xml         ← Bundle manifest
-├── Install-Bundle.bat          ← Copies .bundle to %APPDATA%\Autodesk\ApplicationPlugins
-└── Install-Registry.ps1        ← Registry injection (reliable fallback)
-```
-
----
-
-## Build
-
-1. Open a Developer Command Prompt or VS 2022.
-2. Ensure AutoCAD 2026 is installed at the default path.
-3. `dotnet build -c Release`
-4. Output: `bin\Release\net8.0-windows\EGISLayoutManager.dll`
 
 ---
 
