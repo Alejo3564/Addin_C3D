@@ -27,35 +27,6 @@ and lives under the **EGIS Smart Tools** ribbon tab.
 
 ---
 
-### Command flow
-
-```
-Ribbon button click
-    │
-    └─► SendStringToExecute("EGIS_STREETVIEW_OPEN ")
-            │
-            └─► [CommandMethod("EGIS_STREETVIEW_OPEN")]
-                    Opens / activates the dockable palette
-
-User clicks "Pick Point in Model"
-    │
-    └─► Palette fires PickPointRequested event
-            │
-            └─► SendStringToExecute("EGIS_STREETVIEW_PICK ")
-                    │
-                    └─► [CommandMethod("EGIS_STREETVIEW_PICK")]  (main thread)
-                            ├── Check geolocation → warn if missing
-                            ├── ed.GetPoint() — user picks in viewport
-                            ├── CoordinateTransformer.TryModelToWgs84()
-                            └─► palette.LoadStreetView(lat, lon)
-                                    ├── WebView2 available? → load HTML with Google Maps embed
-                                    └── WebView2 missing?  → show fallback + "Open in Browser"
-```
-
----
-
-
-
 
 ## Usage
 
