@@ -17,7 +17,7 @@ Restart Civil 3D.
 ```
 Open Register_EGISLayoutManager.ps1 in Note Pad or anytext editor
 Copy all information
-Open Windows PowerShell an paste text > press enter whrn register finishs
+Open Windows PowerShell an paste text > press enter when register finishes
 ```
 Auto-detects all AutoCAD profiles under HKCU.  
 Restart Civil 3D.
