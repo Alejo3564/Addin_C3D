@@ -5,18 +5,19 @@
 
 ---
 
-## Deployment
+## Install
 
-### Option A — Bundle (preferred)
+### Step 1 — Install_EGISLayoutManager.bat
 ```
-Install-Bundle.bat
+Doble click on Install_EGISLayoutManager.bat
 ```
-Creates `%APPDATA%\Autodesk\ApplicationPlugins\EGISLayoutManager.bundle\`  
 Restart Civil 3D.
 
-### Option B — Registry injection (fallback if bundle R-number mismatch)
-```powershell
-.\Install-Registry.ps1 -DllPath "path\to\EGISLayoutManager.dll"
+### Step 2 — Registry injection 
+```
+Open Register_EGISLayoutManager.ps1 in Note Pad or anytext editor
+Copy all information
+Open Windows PowerShell an paste text > press enter whrn register finishs
 ```
 Auto-detects all AutoCAD profiles under HKCU.  
 Restart Civil 3D.
