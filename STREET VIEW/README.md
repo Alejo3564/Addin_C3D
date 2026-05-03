@@ -7,8 +7,6 @@ a geolocated model and instantly view **Google Street View** at that real-world
 location — either embedded directly inside Civil 3D (via WebView2) or in the
 system browser as a fallback.
 
-It follows the same architecture, branding, and patterns as **EGIS Parameter Sync**
-and lives under the **EGIS Smart Tools** ribbon tab.
 
 ---
 
