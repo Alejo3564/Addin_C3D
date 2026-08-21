@@ -1,7 +1,13 @@
 ; ============================================================
 ;  EGIS Layout Manager — Inno Setup Installer Script v1.0
-;  No admin rights required — everything goes to %APPDATA%
-;  [Code] is LAST section (Pascal compiler requirement)
+;  AutoCAD / Civil 3D 2026
+;
+;  KEY FIX: When CreateAppDir=no, Inno Setup maps {app} to {win}
+;  (the Windows folder) and tries to write the uninstaller there,
+;  which requires administrator rights and causes:
+;      "CreateFile failed; code 5. Access denied."
+;  The solution is to set UninstallFilesDir explicitly to a
+;  user-writable location.
 ; ============================================================
 
 #define AppName      "EGIS Layout Manager"
@@ -12,6 +18,9 @@
 #define DllName      "EGISLayoutManager.dll"
 #define RegAppKey    "EGISLayoutManager"
 #define SourceBase   "D:\2_ALEJO\APP_BIM\CIVIL 3D\EGISLayoutManager\Installer"
+
+; Destination root — user-writable, no admin needed
+#define InstallRoot  "{userappdata}\Autodesk\ApplicationPlugins\EGISLayoutManager.bundle"
 
 ; ==============================================================================
 [Setup]
@@ -24,18 +33,19 @@ AppPublisherURL          = {#AppURL}
 AppSupportURL            = {#AppURL}
 AppUpdatesURL            = {#AppURL}
 
-; ── No admin required ─────────────────────────────────────────────────────────
+; ── No administrator rights ───────────────────────────────────────────────────
 PrivilegesRequired                 = lowest
 PrivilegesRequiredOverridesAllowed = dialog
 
-; ── Install dir: point to the actual bundle destination (user-writable)
-;    CreateAppDir=no means no extra folder is created, but DefaultDirName
-;    must still be a user-writable path so uninstall info doesn't touch
-;    Program Files (which causes "Access denied – code 5")
-; ─────────────────────────────────────────────────────────────────────────────
-DefaultDirName           = {userappdata}\Autodesk\ApplicationPlugins\{#BundleName}
+; ── App directory ─────────────────────────────────────────────────────────────
+; CreateAppDir=no means no separate program folder is created.
+DefaultDirName           = {#InstallRoot}
 CreateAppDir             = no
 UsePreviousAppDir        = no
+
+; ── CRITICAL: where the uninstaller (unins000.exe/.dat) is written ────────────
+; Without this line Inno defaults to {win} → Access denied (code 5)
+UninstallFilesDir        = {userappdata}\EGIS\LayoutManager\uninstall
 
 ; ── Output ────────────────────────────────────────────────────────────────────
 OutputDir                = {#SourceBase}
@@ -48,6 +58,7 @@ WizardStyle              = modern
 DisableWelcomePage       = no
 DisableDirPage           = yes
 DisableProgramGroupPage  = yes
+DisableReadyPage         = no
 ShowLanguageDialog       = no
 
 ; ── Uninstall ─────────────────────────────────────────────────────────────────
@@ -58,6 +69,7 @@ CreateUninstallRegKey    = yes
 ; ── Version info ──────────────────────────────────────────────────────────────
 VersionInfoVersion       = {#AppVersion}
 VersionInfoCompany       = {#AppPublisher}
+VersionInfoProductName   = {#AppName}
 VersionInfoDescription   = {#AppName} Installer
 
 ; ==============================================================================
@@ -69,10 +81,19 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Messages]
 ; ==============================================================================
 WelcomeLabel1=Welcome to the [bold]{#AppName}[/bold] Setup Wizard
-WelcomeLabel2=This will install [bold]{#AppName} v{#AppVersion}[/bold] on your computer.%n%nPlugin for AutoCAD / Civil 3D 2026.%n%nClick Next to continue.
+WelcomeLabel2=This will install [bold]{#AppName} v{#AppVersion}[/bold] on your computer.%n%nPlugin for AutoCAD / Civil 3D 2026.%n%nNo administrator rights are required.%n%nClick Next to continue.
 FinishedHeadingLabel=Installation Complete
-FinishedLabel={#AppName} has been installed successfully.%n%nRestart AutoCAD or Civil 3D to activate the plugin.%n%nThe [bold]EGIS Layout Manager[/bold] button will appear in the [bold]EGIS Smart Tools[/bold] ribbon tab under [bold]Layouts %& Sheet[/bold].
+FinishedLabel={#AppName} has been installed successfully.%n%nRestart AutoCAD or Civil 3D to activate the plugin.%n%nThe [bold]Layout Manager[/bold] button will appear in the [bold]EGIS Smart Tools[/bold] ribbon tab under [bold]Layouts %& Sheet[/bold].
 ClickFinish=Click [bold]Finish[/bold] to exit Setup.
+
+; ==============================================================================
+[Dirs]
+; Explicitly create the target folders with user permissions
+; ==============================================================================
+Name: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}"
+Name: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents"
+Name: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\Resources"
+Name: "{userappdata}\EGIS\LayoutManager\uninstall"
 
 ; ==============================================================================
 [Files]
@@ -81,79 +102,77 @@ ClickFinish=Click [bold]Finish[/bold] to exit Setup.
 ; PackageContents.xml — bundle root
 Source: "{#SourceBase}\{#BundleName}\PackageContents.xml"; \
         DestDir: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}"; \
-        Flags: ignoreversion
+        Flags: ignoreversion uninsremovereadonly
 
-; DLL
+; Main DLL
 Source: "{#SourceBase}\{#BundleName}\Contents\{#DllName}"; \
         DestDir: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents"; \
-        Flags: ignoreversion
+        Flags: ignoreversion uninsremovereadonly
 
 ; deps.json
 Source: "{#SourceBase}\{#BundleName}\Contents\EGISLayoutManager.deps.json"; \
         DestDir: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents"; \
-        Flags: ignoreversion
+        Flags: ignoreversion uninsremovereadonly
 
-; pdb (debug symbols — optional)
+; pdb — optional debug symbols
 Source: "{#SourceBase}\{#BundleName}\Contents\EGISLayoutManager.pdb"; \
         DestDir: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents"; \
-        Flags: ignoreversion skipifsourcedoesntexist
+        Flags: ignoreversion skipifsourcedoesntexist uninsremovereadonly
 
-; Resources folder (icons, etc.)
+; Resources (icons)
 Source: "{#SourceBase}\{#BundleName}\Contents\Resources\*"; \
         DestDir: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\Resources"; \
-        Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
+        Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist uninsremovereadonly
 
 ; ==============================================================================
 [Registry]
-; Static entries for the two most common Civil 3D 2026 profile keys.
-; [Code] section also writes these dynamically for ALL detected profiles.
+; Static entries for the most common Civil 3D 2026 profile keys.
+; The [Code] section also handles ALL detected profiles dynamically.
 ; ==============================================================================
 
-; ACAD-9001:409
+; ── ACAD-9001:409 ─────────────────────────────────────────────────────────────
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9001:409\Applications\{#RegAppKey}"; \
      ValueType: string; ValueName: "DESCRIPTION"; ValueData: "{#AppName}"; \
-     Flags: uninsdeletekey createvalueifdoesntexist
+     Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9001:409\Applications\{#RegAppKey}"; \
-     ValueType: dword;  ValueName: "LOADCTRLS";   ValueData: "14"; \
-     Flags: createvalueifdoesntexist
+     ValueType: dword;  ValueName: "LOADCTRLS"; ValueData: "14"
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9001:409\Applications\{#RegAppKey}"; \
      ValueType: string; ValueName: "LOADER"; \
-     ValueData: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\{#DllName}"; \
-     Flags: createvalueifdoesntexist
+     ValueData: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\{#DllName}"
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9001:409\Applications\{#RegAppKey}"; \
-     ValueType: dword;  ValueName: "MANAGED";     ValueData: "1"; \
-     Flags: createvalueifdoesntexist
+     ValueType: dword;  ValueName: "MANAGED"; ValueData: "1"
 
-; ACAD-9100:409
+; ── ACAD-9100:409 ─────────────────────────────────────────────────────────────
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppKey}"; \
      ValueType: string; ValueName: "DESCRIPTION"; ValueData: "{#AppName}"; \
-     Flags: uninsdeletekey createvalueifdoesntexist
+     Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppKey}"; \
-     ValueType: dword;  ValueName: "LOADCTRLS";   ValueData: "14"; \
-     Flags: createvalueifdoesntexist
+     ValueType: dword;  ValueName: "LOADCTRLS"; ValueData: "14"
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppKey}"; \
      ValueType: string; ValueName: "LOADER"; \
-     ValueData: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\{#DllName}"; \
-     Flags: createvalueifdoesntexist
+     ValueData: "{userappdata}\Autodesk\ApplicationPlugins\{#BundleName}\Contents\{#DllName}"
 Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppKey}"; \
-     ValueType: dword;  ValueName: "MANAGED";     ValueData: "1"; \
-     Flags: createvalueifdoesntexist
+     ValueType: dword;  ValueName: "MANAGED"; ValueData: "1"
 
 ; ==============================================================================
-; [Code] — MUST BE THE LAST SECTION
-; Dynamically enumerates all AutoCAD profiles installed on this machine
-; and writes/removes the plugin registry entries (mirrors Install-Registry.ps1)
+; [Code] — MUST BE THE LAST SECTION (Pascal compiler requirement)
+; Enumerates every AutoCAD profile in HKCU and registers/unregisters the plugin
 ; ==============================================================================
 [Code]
 
 const
-  ACAD_BASE    = 'Software\Autodesk\AutoCAD';
-  APP_KEY      = 'EGISLayoutManager';
-  BUNDLE_PATH  = '\Autodesk\ApplicationPlugins\EGISLayoutManager.bundle\Contents\EGISLayoutManager.dll';
+  ACAD_BASE = 'Software\Autodesk\AutoCAD';
+  APP_KEY   = 'EGISLayoutManager';
+
+function BundleRoot: String;
+begin
+  Result := ExpandConstant('{userappdata}') +
+            '\Autodesk\ApplicationPlugins\EGISLayoutManager.bundle';
+end;
 
 function DllPath: String;
 begin
-  Result := ExpandConstant('{userappdata}') + BUNDLE_PATH;
+  Result := BundleRoot + '\Contents\EGISLayoutManager.dll';
 end;
 
 procedure WriteReg(const ProfileKey: String);
@@ -169,8 +188,7 @@ end;
 
 procedure RemoveReg(const ProfileKey: String);
 begin
-  RegDeleteKeyIncludingSubkeys(HKCU,
-    ProfileKey + '\Applications\' + APP_KEY);
+  RegDeleteKeyIncludingSubkeys(HKCU, ProfileKey + '\Applications\' + APP_KEY);
 end;
 
 procedure ProcessAllProfiles(DoWrite: Boolean);
@@ -215,9 +233,6 @@ begin
   if CurUninstallStep = usPostUninstall then
   begin
     ProcessAllProfiles(False);
-    DelTree(
-      ExpandConstant('{userappdata}') +
-      '\Autodesk\ApplicationPlugins\EGISLayoutManager.bundle',
-      True, True, True);
+    DelTree(BundleRoot, True, True, True);
   end;
 end;
