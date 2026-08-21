@@ -1,22 +1,24 @@
 ; ============================================================
 ;  EGIS Smart Tools - PDF Sheet Exporter
-;  Inno Setup Script v1.0
+;  Inno Setup Script v2.1
 ;
-;  Place this .iss file inside the Installer\ folder:
+;  Loading strategy: DUAL
+;    1. Bundle in ApplicationPlugins (auto-scan by Civil 3D)
+;    2. HKCU registry entries (reliable fallback, no admin needed)
+;
+;  Folder structure required next to this .iss:
 ;
 ;  Installer\
-;  ├── EGISPdfExporter_Setup.iss   <- this file
-;  └── EGISPdfExporter.bundle\
-;      ├── PackageContents.xml
-;      └── Contents\
-;          └── Win64\
-;              ├── EGISPdfExporter.dll
-;              └── Resources\
-;                  ├── icon_32.png
-;                  └── icon_16.png
-;
-;  No administrator rights required.
-;  No registry entries needed (bundle auto-loaded by Civil 3D).
+;  |-- EGISPdfExporter_Setup.iss
+;  `-- EGISPdfExporter.bundle\
+;      |-- PackageContents.xml
+;      `-- Contents\Win64\
+;          |-- EGISPdfExporter.dll
+;          |-- EGISPdfExporter.deps.json
+;          |-- EGISPdfExporter.pdb
+;          `-- Resources\
+;              |-- icon_32.png
+;              `-- icon_16.png
 ; ============================================================
 
 #define AppName      "EGIS PDF Sheet Exporter"
@@ -24,6 +26,7 @@
 #define AppPublisher "EGIS Colombia"
 #define AppURL       "https://www.egis.com.co"
 #define BundleName   "EGISPdfExporter.bundle"
+#define RegAppName   "EGISPdfExporter"
 
 [Setup]
 AppId={{B3F1A2C4-E7D5-4F90-BC12-9A8E3D56F701}
@@ -46,6 +49,8 @@ WizardResizable=no
 DisableReadyPage=no
 ShowLanguageDialog=no
 LanguageDetectionMethod=none
+Uninstallable=yes
+UninstallDisplayName={#AppName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -58,10 +63,29 @@ FinishedLabel={#AppName} has been successfully installed.%n%nStart Civil 3D 2026
 ClickFinish=Click Finish to close this wizard.
 
 [Files]
-; Copy the entire bundle folder recursively in one line
-Source: "{#BundleName}\*"; \
-    DestDir: "{app}"; \
-    Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#BundleName}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Registry]
+; ══════════════════════════════════════════════════════════════
+;  Registry auto-load (HKCU = current user, no admin required)
+;  Registered for both AutoCAD and Civil 3D 2026 (R25.1)
+;  LOADCTRLS = 14  -> load on startup + on command + on request
+;  MANAGED   = 1   -> .NET managed assembly
+; ══════════════════════════════════════════════════════════════
+
+; ── AutoCAD 2026 (ACAD-9100:409) ──────────────────────────────
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppName}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppName}"; ValueType: string; ValueName: "DESCRIPTION"; ValueData: "{#AppName}"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppName}"; ValueType: dword; ValueName: "LOADCTRLS"; ValueData: "14"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppName}"; ValueType: string; ValueName: "LOADER"; ValueData: "{app}\Contents\Win64\EGISPdfExporter.dll"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Applications\{#RegAppName}"; ValueType: dword; ValueName: "MANAGED"; ValueData: "1"
+
+; ── Civil 3D 2026 (ACAD-B001:409) ─────────────────────────────
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-B001:409\Applications\{#RegAppName}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-B001:409\Applications\{#RegAppName}"; ValueType: string; ValueName: "DESCRIPTION"; ValueData: "{#AppName}"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-B001:409\Applications\{#RegAppName}"; ValueType: dword; ValueName: "LOADCTRLS"; ValueData: "14"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-B001:409\Applications\{#RegAppName}"; ValueType: string; ValueName: "LOADER"; ValueData: "{app}\Contents\Win64\EGISPdfExporter.dll"
+Root: HKCU; Subkey: "Software\Autodesk\AutoCAD\R25.1\ACAD-B001:409\Applications\{#RegAppName}"; ValueType: dword; ValueName: "MANAGED"; ValueData: "1"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
